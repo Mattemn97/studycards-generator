@@ -4,7 +4,7 @@ Questo progetto genera automaticamente flashcard stampabili in formato PDF a par
 ## 📂 Struttura del progetto
 flashcard_generator/
 - flashcards.csv # File di input (modificabile)
-- main.py # Script principale
+- main.py  # Script principale
 - README.md # Questo file
 
 ## 🛠 Requisiti
