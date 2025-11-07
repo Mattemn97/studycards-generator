@@ -3,6 +3,7 @@
 """
 Generatore di flashcard stampabili (fronte/retro)
 Interazione guidata passo-passo + barra di progresso con tqdm.
+Ora con opzione per impostare la dimensione del font principale.
 """
 
 import csv
@@ -26,7 +27,9 @@ CARDS_PER_COL = 6
 MARGIN_X = 1 * cm
 MARGIN_Y = 2 * cm
 GAP = 0.5 * cm
-FONT_SIZE = 14
+
+# Dimensione di default (modificabile dall'utente durante il flusso guidato)
+FONT_SIZE = 11
 TAG_FONT_SIZE = 10
 
 
@@ -34,11 +37,13 @@ TAG_FONT_SIZE = 10
 def draw_text(canv, x, y, width, height, text, tag):
     """
     Disegna il testo centrato all'interno della carta e il tag in basso a destra.
+    Usa le variabili globali FONT_SIZE e TAG_FONT_SIZE.
     """
     # Forza a capo sui trattini e wrap intelligente
     text = text.replace('-', '-\n')
     lines = []
     for chunk in text.split('\n'):
+        # la larghezza di wrap è fissa, funziona bene nella maggior parte dei casi
         lines.extend(textwrap.wrap(chunk, width=30))
 
     canv.setFont("Helvetica-Bold", FONT_SIZE)
@@ -74,7 +79,7 @@ def load_flashcards(csv_file_path):
         # Prova mappature comuni
         map_latoa = normalized.get('latoa') or normalized.get('sidea') or normalized.get('a')
         map_latob = normalized.get('latob') or normalized.get('sideb') or normalized.get('b')
-        map_tag = normalized.get('tag') or normalized.get('labels') or normalized.get('etichetta')
+        map_tag = normalized.get('tag') or normalized.get('labels') or normalized.get('etichetta') or normalized.get('tags')
 
         if not map_latoa or not map_latob:
             raise ValueError("CSV manca colonne necessarie. Serve 'Lato A' e 'Lato B' (anche con nomi leggermente diversi).")
@@ -145,9 +150,6 @@ def generate_flashcard_pdfs(cards, front_path, back_path):
 
     # Disegna lato fronte e retro aggiornando la stessa pbar
     create_flashcard_page(fronte, cards, is_front=True, pbar=pbar)
-    # Assicurati che la pagina corrente venga mantenuta (ReportLab salva l'ultima pagina quando canvas.save() chiamato)
-    if pbar:
-        pass
     create_flashcard_page(retro, cards, is_front=False, pbar=pbar)
 
     if pbar:
@@ -200,6 +202,8 @@ def merge_pdfs(front_path, back_path, output_path, remove_intermediate=True):
 
 # ---------------- flusso guidato ----------------
 def guided_flow():
+    global FONT_SIZE, TAG_FONT_SIZE
+
     os.system('cls' if os.name == 'nt' else 'clear')
     print("— Generatore flashcard (guidato) —\n")
     print("Ti guiderò passo passo. Se vuoi uscire in qualsiasi prompt, premi INVIO senza inserire nulla.\n")
@@ -235,12 +239,31 @@ def guided_flow():
     keep_mid = input("\n3) Vuoi mantenere i file intermedi (fronte/reto)? [s/N]: ").strip().lower()
     keep_mid_flag = keep_mid == 's' or keep_mid == 'si'
 
+    # 4) Dimensione del font principale
+    while True:
+        font_input = input("\n4) Dimensione del font principale (numero intero, default 11): ").strip()
+        if font_input == "":
+            # mantieni valore di default
+            break
+        try:
+            v = int(font_input)
+            if v < 6 or v > 72:
+                print("Inserisci un intero tra 6 e 72. Riprova.")
+                continue
+            FONT_SIZE = v
+            # imposta TAG_FONT_SIZE proporzionalmente, con minimo 8
+            TAG_FONT_SIZE = max(8, int(round(FONT_SIZE * 0.85)))
+            break
+        except ValueError:
+            print("Valore non valido. Inserisci un numero intero. Riprova.")
+
     # Feedback prima di partire
     print("\nPronto a generare le flashcard con le seguenti impostazioni:")
     print(f" - CSV: {csv_path}")
     print(f" - Carte trovate: {len(cards)}")
     print(f" - Output finale: {out_name}")
     print(f" - Mantieni intermedi: {'Sì' if keep_mid_flag else 'No'}")
+    print(f" - Font principale: {FONT_SIZE} pt, Tag font: {TAG_FONT_SIZE} pt")
     if tqdm is None:
         print("\nℹ️ Nota: 'tqdm' non è installato. Vedi 'pip install tqdm' per la barra di progresso.")
     input("\nPremi INVIO per iniziare...")
@@ -249,11 +272,11 @@ def guided_flow():
     front_path = "flashcards_fronte.pdf"
     back_path = "flashcards_retro.pdf"
 
-    # 4) Generazione (con barra se disponibile)
+    # 5) Generazione (con barra se disponibile)
     print("\n⏳ Generazione in corso...")
     generate_flashcard_pdfs(cards, front_path, back_path)
 
-    # 5) Merge automatico
+    # 6) Merge automatico
     merge_pdfs(front_path, back_path, out_name, remove_intermediate=not keep_mid_flag)
 
     print("\nTutto fatto! Buona stampa 🎉")
