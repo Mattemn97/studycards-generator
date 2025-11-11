@@ -1,56 +1,97 @@
-# 🃏 Generatore di Flashcard PDF
-Questo progetto genera automaticamente flashcard stampabili in formato PDF a partire da un file CSV. Le carte vengono organizzate in modo ottimale per la stampa fronte-retro, con testi personalizzabili su **Lato A** e **Lato B**, e un campo **Tag** per classificazione o categorie.
+# 🃏 Generatore di Flashcard Stampabili (Fronte/Retro)
+Script Python per creare flashcard stampabili fronte-retro a partire da un file CSV.
+Pensato per essere facile da usare, completamente personalizzabile e con una procedura guidata passo-passo da terminale.
 
-## 📂 Struttura del progetto
-flashcard_generator/
-- flashcards.csv # File di input (modificabile)
-- main.py  # Script principale
-- README.md # Questo file
+## ✨ Funzionalità principali
+- 🧭 Interfaccia guidata passo-passo da terminale
+- 📐 Scelta del formato pagina (A0–A6)
+- 🧮 Calcolo automatico del layout (righe, colonne, carte per pagina)
+- 📝 Supporto CSV con intestazioni flessibili
+- 🔄 Generazione automatica di fronte e retro specchiati
+- 📊 Barra di progresso con tqdm
+- 🖋️ Personalizzazione del font principale e dei tag
+- 🧩 Possibilità di unione automatica in un singolo PDF finale
 
-## 🛠 Requisiti
-- Python ≥ 3.7
-- [reportlab](https://pypi.org/project/reportlab/)
-- [PyPDF2](https://pypi.org/project/PyPDF2/) *(opzionale, ma consigliato per unire i PDF fronte e retro)*
+## 📂 Struttura del CSV
+Il file CSV deve avere come delimitatore il punto e virgola (;) e deve contenere almeno le colonne per i due lati della carta.
+
+Esempio:
+```c
+Lato A;Lato B;Tag
+Ha salutato qualcuno che non lo stava salutando;6;Errori e figuracce
+Ha risposto “anche a te” dopo un “buon appetito” del cameriere;1;Errori e figuracce
+Ha riso a una battuta che non era una battuta;1;Errori e figuracce
+```
+
+Le intestazioni possono anche chiamarsi Side A, Side B, A, B, Etichetta, Label, ecc.
+Lo script riconosce automaticamente le varianti più comuni.
+
 
 Installa le dipendenze con:
 ```bash
 pip install reportlab PyPDF2
 ```
 
-📄 Formato del file CSV
-Il file flashcards.csv deve contenere tre colonne separate da ;:
+## 📄 Formato del file CSV
+Il file flashcards.csv deve contenere tre colonne separate da (;) e deve contenere almeno le colonne per i due lati della carta.
+
 ```csv
 Lato A;Lato B;Tag
 Che cos'è un algoritmo?;Una sequenza finita di istruzioni...;Informatica
 Capitale della Francia?;Parigi;Geografia
 ```
 
-▶️ Utilizzo
-Esegui lo script principale:
-
+## ⚙️ Installazione
+Assicurati di avere Python 3.7+ installato, poi installa le dipendenze:
 ```bash
-python main.py
+pip install reportlab tqdm PyPDF2
 ```
 
-Alla fine, otterrai:
-- flashcards_finale.pdf: PDF pronto da stampare fronte-retro
-- (temporanei) flashcards_fronte.pdf e flashcards_retro.pdf se PyPDF2 non è installato
+Clona o scarica questo repository, quindi esegui lo script:
+```bash
+python3 flashcard_generator.py
+```
 
-🎯 Caratteristiche
-- Supporta la stampa fronte-retro con allineamento speculare
-- Adatta il testo al layout con word wrapping intelligente
-- Gestisce automaticamente il numero di carte per pagina
-- Ogni carta mostra un tag in basso a destra
+## 🧭 Utilizzo (modalità guidata)
 
-📌 Suggerimenti
-- Usa trattini - per forzare l'andata a capo nel testo
-- I tag possono essere usati per filtrare o ordinare il contenuto
-- Puoi usare questo tool per vocabolari, quiz, definizioni, date storiche, ecc.
+Avvia lo script e segui le istruzioni nel terminale.
 
-💡 Personalizzazioni possibili
-- Cambia dimensioni carta/modello nel file main.py
-- Aggiungi colori, loghi o font personalizzati
-- Integra un’interfaccia CLI o GUI
+La procedura prevede i seguenti passaggi:
+1. Percorso CSV → seleziona il file con le carte.
+2. Formato pagina → scegli tra A0–A6.
+3. Dimensioni carte → inserisci larghezza e altezza (cm).
+4. Dimensione font → imposta la grandezza del testo principale.
+5. Anteprima impostazioni → visualizza il layout calcolato.
+6. Generazione → conferma per creare i PDF fronte e retro.
 
-📬 Contatti
-Per suggerimenti o miglioramenti, apri una Issue o contattami tramite GitHub!
+Al termine troverai:
+- flashcards_fronte.pdf
+- flashcards_retro.pdf
+- flashcards.pdf (versione combinata fronte-retro)
+
+# 📊 Esempio di output
+``` yaml
+📋 Anteprima impostazioni:
+   • Formato pagina: A4 (21.0x29.7 cm)
+   • Dimensione carta: 6.0x4.0 cm
+   • Margini: 1.0x2.0 cm, gap 0.5 cm
+   • Layout: 3 colonne x 5 righe = 15 carte per pagina
+   • Font principale: 11 pt, tag: 10 pt
+   • Numero carte totali: 60 → 4 pagine circa
+```
+Durante la generazione verrà mostrata una barra di progresso in tempo reale.
+
+
+# 📦 Output finale
+Lo script produce:
+- ✅ flashcards_fronte.pdf – il lato A di ogni carta
+- ✅ flashcards_retro.pdf – il lato B, specchiato per stampa corretta
+- ✅ flashcards.pdf – versione combinata (fronte + retro intercalati)
+
+🧠 Suggerimenti
+
+- Stampa fronte-retro su lato corto per allineare perfettamente le carte.
+- Usa carta spessa (150–200 g/m²) per un risultato migliore.
+- Se vuoi carte più piccole o più grandi, modifica larghezza/altezza nella procedura guidata.
+- I tag appaiono in basso a destra, in corsivo, utili per categorizzare le carte.
+
